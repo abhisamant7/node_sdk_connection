@@ -1,128 +1,206 @@
 {
-    "name": "default-svc-cluster-local-network",
-    "version": "1.4.3",
-    "client": {
-        "tlsEnable": false,
-    "adminUser": "admin",
-    "adminPassword": "adminpw",
-    "enableAuthentication": false,
-        "organization": "org1",
-        "connection": {
-            "timeout": {
-                "peer": {
-                    "endorser": "300"
-                },
-                "orderer": "300"
-            }
+   "name": "default-svc-cluster-local-network",
+   "version": "1.4.3",
+   "client": {
+       "tlsEnable": true,
+   "adminUser": "admin",
+   "adminPassword": "adminpw",
+   "enableAuthentication": false,
+       "organization": "org1",
+       "logging": {
+           "level": "debug"
+         },
+       "connection": {
+           "timeout": {
+               "peer": {
+                   "endorser": "300"
+               },
+               "orderer": "300"
+           }
+       }
+   },
+   "BCCSP": {
+       "security": {
+         "enabled": true,
+         "default": {
+           "provider": "SW"
+         },
+         "hashAlgorithm": "SHA2",
+         "softVerify": true,
+         "level": 256
+       }
+     },
+  "channels": {
+     "mainchannel": {
+        "orderers": [
+           "orderer0-service"
+        ],
+        "peers": {
+           "peer0-org1-service": {
+              "endorsingPeer": true,
+              "chaincodeQuery": true,
+              "ledgerQuery": true,
+              "eventSource": true
+               },
+               
+                "connection": {
+                    "timeout": {
+                       "peer": {
+                           "endorser": "10000",
+                           "eventHub": "10000",
+                           "eventReg": "10000"
+                       }
+                   }
+               },
+           "peer0.org2-service": {
+              "endorsingPeer": true,
+              "chaincodeQuery": true,
+              "ledgerQuery": true,
+              "eventSource": true
+           }
         }
-    },
-   "channels": {
-      "mainchannel": {
-         "orderers": [
-            "orderer.org1"
-         ],
-         "peers": {
-            "peer0.org1": {
-               "endorsingPeer": true,
-               "chaincodeQuery": true,
-               "ledgerQuery": true,
-               "eventSource": true
-                },
-                
-                 "connection": {
-                     "timeout": {
-                        "peer": {
-                            "endorser": "10000",
-                            "eventHub": "10000",
-                            "eventReg": "10000"
-                        }
-                    }
-                },
-            "peer0.org2": {
-               "endorsingPeer": true,
-               "chaincodeQuery": true,
-               "ledgerQuery": true,
-               "eventSource": true
-            }
+     }
+  },
+  "organizations": {
+     "org1": {
+        "mspid": "org1MSP",
+        "peers": [
+           "peer0-org1-service"
+        ],
+        "certificateAuthorities": [
+           "ca.org1"
+        ],
+        "adminPrivateKey": {
+           "path": "./crypto-config/peerOrganizations/org1/users/Admin@org1/msp/keystore/c95d0fbd858ea782cf13225658f6a57ae29b7550fa37de2fbf7f3cce70c9f7a6_sk"
+        },
+        "signedCert": {
+           "path": "./crypto-config/peerOrganizations/org1/users/Admin@org1/msp/signcerts/Admin@org1-cert.pem"
+        }
+     },
+     "org2": {
+        "mspid": "org2MSP",
+        "peers": [
+           "peer0.org2-service"
+        ],
+        "certificateAuthorities": [
+           "ca.org2"
+        ],
+        "adminPrivateKey": {
+           "path": "./crypto-config/peerOrganizations/org2/users/Admin@org2/msp/keystore/8394d46aaffb88dead002899dd962fa72a80178b940a6cdad6365484aa491e56_sk"
+        },
+        "signedCert": {
+           "path": "./crypto-config/peerOrganizations/org2/users/Admin@org2/msp/signcerts/Admin@org2-cert.pem"
+        }
+     }
+  },
+ 
+  "orderers": {
+   "_default": {
+       "grpcOptions": {
+         "keep-alive-time": "0s",
+         "keep-alive-timeout": "20s",
+         "keep-alive-permit": false,
+         "fail-fast": false,
+         "allow-insecure": false
+       },
+     "orderer0-service": {
+        "url": "grpc://aa3d54146309c11ea9fec02845472515-1964077296.us-east-2.elb.amazonaws.com:7050", 
+        "grpcOptions": {
+           "ssl-target-name-override": "orderer0-service"
+        },
+        "tlsCACerts": {
+           "path": "/crypto-config/ordererOrganizations/default.svc.cluster.local/msp/tlscacerts/ca-root-7054.pem"
          }
-      }
+     }
+  },
+  "orderer1-service": {
+   "url": "grpc://aa42f1355309c11ea9fec02845472515-268396921.us-east-2.elb.amazonaws.com:7050", 
+   "grpcOptions": {
+     "ssl-target-name-override": "orderer1-service"
    },
-   "organizations": {
-      "org1": {
-         "mspid": "org1MSP",
-         "peers": [
-            "peer0.org1"
-         ],
-         "certificateAuthorities": [
-            "ca.org1"
-         ],
-         "adminPrivateKey": {
-            "path": "./crypto-config/peerOrganizations/org1/users/Admin@org1/msp/keystore/111c9561b4403684d28184f7f9b97f44c87490eaf12bf1807209dc0288c13df1_sk"
-         },
-         "signedCert": {
-            "path": "./crypto-config/peerOrganizations/org1/users/Admin@org1/msp/signcerts/Admin@org1-cert.pem"
-         }
-      },
-      "org2": {
-         "mspid": "org2MSP",
-         "peers": [
-            "peer0.org2"
-         ],
-         "certificateAuthorities": [
-            "ca.org2"
-         ],
-         "adminPrivateKey": {
-            "path": "./crypto-config/peerOrganizations/org2/users/Admin@org2/msp/keystore/cb21085397b1da16f2b80ab75f87ab0ff58192f7e67e702cda528732f03bffdb_sk"
-         },
-         "signedCert": {
-            "path": "./crypto-config/peerOrganizations/org2/users/Admin@org2/msp/signcerts/Admin@org2-cert.pem"
-         }
-      }
+   "tlsCACerts": {
+     "path": "/crypto-config/ordererOrganizations/default.svc.cluster.local/msp/tlscacerts/ca-root-7054.pem"
+   }
+ },
+ "orderer2-service": {
+   "url": "grpc://aa486017b309c11ea9fec02845472515-2080703689.us-east-2.elb.amazonaws.com:7050", 
+   "grpcOptions": {
+     "ssl-target-name-override": "orderer2-service"
    },
-   "orderers": {
-      "orderer.org1": {
-         "url": "grpc://ec2-3-15-162-41.us-east-2.compute.amazonaws:7050",
-         "grpcOptions": {
-            "ssl-target-name-override": "orderer.org1"
-         }
-      }
-   },
-   "peers": {
-      "peer0.org1": {
-         "url": "grpc://ec2-18-217-255-85.us-east-2.compute.amazonaws:7051",
-         "grpcOptions": {
-            "ssl-target-name-override": "peer0.org1"
-         }
-      },
-      "peer0.org2": {
-         "url": "grpc://ec2-3-15-153-230.us-east-2.compute.amazonaws:7051",
-         "grpcOptions": {
-            "ssl-target-name-override": "peer0.org2"
-         }
-      }
-   },
-   "certificateAuthorities": {
-      "ca.org1": {
-         "url": "http://ec2-18-217-255-85.us-east-2.compute.amazonaws:7054",
-         "httpOptions": {
-            "verify": false
-         },
-         "caName": "ca.org1"
-      },
-      "ca.org2": {
-         "url": "http://ec2-3-15-153-230.us-east-2.compute.amazonaws:7054",
-         "httpOptions": {
-            "verify": false
-         },
-         "caName": "ca.org2"
-      }
+   "tlsCACerts": {
+     "path": "/crypto-config/ordererOrganizations/default.svc.cluster.local/msp/tlscacerts/ca-root-7054.pem"
    }
  }
- 
- 
- 
- 
- 
- 
- 
- 
+},
+  "peers": {
+   "_default": {
+       "grpcOptions": {
+         "keep-alive-time": "1s",
+         "keep-alive-timeout": "20s",
+         "keep-alive-permit": false,
+         "fail-fast": false,
+         "allow-insecure": false
+       }
+     },
+     "peer0-org1-service": {
+        "url": "grpc://afc5396cf309c11eaa0540a72589187e-64503036.us-east-2.elb.amazonaws.com:7051",
+        "grpcOptions": {
+           "ssl-target-name-override": "peer0-org1-service"
+        },
+        "tlsCACerts": {
+           "path": "/crypto-config/peerOrganizations/org1/msp/tlscacerts/ca-root-7054.pem"
+         }
+     },
+     "peer1.org1-service": {
+        "url": "grpc://afca2fdeb309c11eaa0540a72589187e-1036005708.us-east-2.elb.amazonaws.com:7051",
+        "grpcOptions": {
+           "ssl-target-name-override": "peer1.org1-service"
+        },
+        "tlsCACerts": {
+           "path": "/crypto-config/peerOrganizations/org1/msp/tlscacerts/ca-root-7054.pem"
+         }
+     },
+
+     "peer0-org2-service": {
+       "url": "grpc://a3fd90b8c309d11eaa0540a72589187e-1043197611.us-east-2.elb.amazonaws.com:7051",
+       "grpcOptions": {
+          "ssl-target-name-override": "peer0-org2-service"
+       },
+       "tlsCACerts": {
+          "path": "/crypto-config/peerOrganizations/org1/msp/tlscacerts/ca-root-7054.pem"
+        }
+    },
+    "peer1.org2-service": {
+       "url": "grpc://a4025c28f309d11eaa0540a72589187e-307824613.us-east-2.elb.amazonaws.com:7051",
+       "grpcOptions": {
+          "ssl-target-name-override": "peer1.org2-service"
+       },
+       "tlsCACerts": {
+          "path": "/crypto-config/peerOrganizations/org1/msp/tlscacerts/ca-root-7054.pem"
+        }
+    }
+  },
+  "certificateAuthorities": {
+     "ca.org1": {
+        "url": "http://a00b99068309211ea9fec02845472515-1623075076.us-east-2.elb.amazonaws.com:7054",
+        "httpOptions": {
+           "verify": false
+        },
+        "caName": "ca.org1"
+     },
+     "ca.org2": {
+        "url": "http://a00ff18a3309211ea9fec02845472515-1809685360.us-east-2.elb.amazonaws.com:7054",
+        "httpOptions": {
+           "verify": false
+        },
+        "caName": "ca.org2"
+     }
+  }
+}
+
+
+
+
+
+
+
